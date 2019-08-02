@@ -83,7 +83,7 @@ esptool.py --port /dev/ttyUSB0 --baud 230400 write_flash -fs 32m -ff 80m \
     0x00000 boot_v1.5.bin 0x1000 user1.bin \
     0x3FC000 esp_init_data_default.bin 0x3FE000 blank.bin
 ```
-I use a high baud rate as shown above because I'm impatient, but that's not required.
+I use a high baud rate as shown above because I'm impatient, but that's not required. Attention: For some modules you have to set the flash mode to `dio` by adding `--fm dio` to the command line above, otherwise they won't boot. 
 
 ### 4Mbit / 512Kbyte module
 ```
@@ -99,6 +99,16 @@ flash modules. Note the different address for esp_init_data_default.bin and blan
 (the SDK stores its wifi settings near the end of flash, so it changes with flash size).
 
 For __8Mbit / 1MByte__ modules the addresses are 0xFC000 and 0xFE000.
+
+Debian, and probably other Linux distributions, come with a different esptool. It is similar,
+but all the flags are different. Here is an example of flashing an **ESP-01S** which has 1M of flash using
+```
+esptool -cp /dev/ttyUSB0 -cb 460800 -cd none -bz 1M\
+        -ca 0x00000 -cf boot_v1.7.bin\
+        -ca 0x01000 -cf user1.bin\
+        -ca 0xFC000 -cf esp_init_data_default.bin\
+        -ca 0xFE000 -cf blank.bin
+```
 
 __Warning__: there is a bug in boot_v1.5.bin which causes it to only boot into user1 once.
 If that fails it gets stuck trying to boot into user2. If this happens (can be seen in the
